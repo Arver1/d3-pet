@@ -18,7 +18,7 @@
   }
   circle {
     fill: yellowgreen;
-    stroke: black;
+    stroke: #fff;
   }
 </style>
 <body>
@@ -29,28 +29,47 @@
 <script src="./d3.v5.min.js"></script>
 <script>
   const svg = d3.select('svg');
-  const coords = [];
+  const underlay = svg.append('g');
 
-  const step = (2 * Math.PI) / 20;
-  const points = d3.range(20);
+  const rect = underlay.selectAll('rect').data([1]);
+
+
+  const coords = [];
+  const depth = 7;
+  const segments = 20;
+  const n = segments * depth;
+  const rSmall = 3;
+  const windowW = window.innerWidth;
+  const windowH =window.innerHeight;
+  const rLarge = Math.min(windowW, windowH) >> 1;
+  const rect1 = rect.enter().append('rect').style('fill', '#454545');
+  rect1.attr('width', '100%').attr('height', '100%');
+
+
+
+  const step = (2 * Math.PI) / segments;
+  const points = d3.range(n);
 
   const origin = {
-    x: window.innerWidth / 2,
-    y: window.innerHeight / 2
-  }
+    x: windowW / 2,
+    y: windowH / 2
+  };
+
+  const radiusStep = rLarge / n;
 
   points.forEach((p, i) => {
     const angle = i * step;
+    const shrinkRadius = rLarge - i * radiusStep;
     coords.push({
-      cx: origin.x + 200 * Math.cos(angle),
-      cy: origin.y + 200 * Math.sin(angle)
+      cx: origin.x + shrinkRadius * Math.cos(angle),
+      cy: origin.y + shrinkRadius * Math.sin(angle)
     });
   });
 
   const circles = svg.selectAll('circle').data(coords);
 
   circles.enter().append('circle')
-    .attr('r', 5)
+    .attr('r', rSmall)
     .attr('cx', function(d) {return d.cx})
     .attr('cy', function(d) {return d.cy});
 </script>
